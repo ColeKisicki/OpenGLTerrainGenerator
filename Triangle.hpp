@@ -1,7 +1,7 @@
 #pragma once
-#include "Vector3.hpp"
+#include "glm/glm.hpp"
 struct Triangle {
-    Vector3 p1, p2, p3;
-    Triangle(Vector3 _p1 = Vector3(0,0,0), Vector3 _p2 = Vector3(0,0,0), Vector3 _p3 = Vector3(0,0,0))
+    glm::vec3 p1, p2, p3;
+    Triangle(glm::vec3 _p1 = glm::vec3(0,0,0), glm::vec3 _p2 = glm::vec3(0,0,0), glm::vec3 _p3 = glm::vec3(0,0,0))
         : p1(_p1), p2(_p2), p3(_p3) {}
 };

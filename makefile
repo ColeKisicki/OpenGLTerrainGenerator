@@ -25,20 +25,20 @@ CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies
-TerrainGenerator.o: TerrainGenerator.cpp CSCIx229.hpp Light.hpp Vector3.hpp Camera.hpp Cube.hpp Plane.hpp Terrain.hpp
-DisplayObject.o: DisplayObject.cpp Vector3.hpp Material.hpp CSCIx229.hpp
-Cube.o: Cube.cpp DisplayObject.hpp CSCIx229.hpp
-Camera.o: Camera.cpp Vector3.hpp CSCIx229.hpp
-Plane.o: Plane.cpp DisplayObject.hpp CSCIx229.hpp
-Scene.o: Scene.cpp DisplayObject.hpp CSCIx229.hpp
-Light.o: Light.cpp Light.hpp Vector3.hpp CSCIx229.hpp
-fatal.o: fatal.cpp CSCIx229.hpp
-errcheck.o: errcheck.cpp CSCIx229.hpp
-print.o: print.cpp CSCIx229.hpp
-loadtexbmp.o: loadtexbmp.cpp CSCIx229.hpp
-loadobj.o: loadobj.cpp CSCIx229.hpp
-projection.o: projection.cpp CSCIx229.hpp
-Terrain.o: Terrain.cpp CSCIx229.hpp
+TerrainGenerator.o: TerrainGenerator.cpp CSCIx229.hpp Light.hpp Camera.hpp Cube.hpp Plane.hpp Terrain.hpp glm/glm.hpp
+DisplayObject.o: DisplayObject.cpp Material.hpp CSCIx229.hpp glm/glm.hpp
+Cube.o: Cube.cpp DisplayObject.hpp CSCIx229.hpp glm/glm.hpp
+Camera.o: Camera.cpp CSCIx229.hpp glm/glm.hpp
+Plane.o: Plane.cpp DisplayObject.hpp CSCIx229.hpp glm/glm.hpp
+Scene.o: Scene.cpp DisplayObject.hpp CSCIx229.hpp glm/glm.hpp
+Light.o: Light.cpp Light.hpp CSCIx229.hpp glm/glm.hpp
+fatal.o: fatal.cpp CSCIx229.hpp glm/glm.hpp
+errcheck.o: errcheck.cpp CSCIx229.hpp glm/glm.hpp
+print.o: print.cpp CSCIx229.hpp glm/glm.hpp
+loadtexbmp.o: loadtexbmp.cpp CSCIx229.hpp glm/glm.hpp
+loadobj.o: loadobj.cpp CSCIx229.hpp glm/glm.hpp
+projection.o: projection.cpp CSCIx229.hpp glm/glm.hpp
+Terrain.o: Terrain.cpp CSCIx229.hpp glm/glm.hpp
 
 #  Create archive
 CSCIx229.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o Light.o DisplayObject.o Cube.o Camera.o Plane.o Scene.o Terrain.o
@@ -52,7 +52,7 @@ CSCIx229.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o Light.
 	g++ -c $(CFLG)  $<
 
 #  Link
-TerrainGenerator:TerrainGenerator.o   CSCIx229.a
+TerrainGenerator:TerrainGenerator.o CSCIx229.a
 	g++ $(CFLG) -o $@ $^  $(LIBS)
 
 #  Clean

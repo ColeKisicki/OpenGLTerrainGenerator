@@ -1,20 +1,20 @@
 #pragma once
-#include "Vector3.hpp"
+#include "glm/glm.hpp"
 
 class Camera
 {
 private:
-    Vector3 Location;
-    Vector3 Rotation;
+    glm::vec3 Location;
+    glm::vec3 Rotation;
     float FOV = 70.f;
 
 public:
     Camera();
-    void SetCameraLocation(Vector3 NewCameraLocation);
-    void SetCameraRotation(Vector3 NewCameraRotation);
+    void SetCameraLocation(glm::vec3 NewCameraLocation);
+    void SetCameraRotation(glm::vec3 NewCameraRotation);
     void SetCameraFOV(float NewCameraFOV);
 
-    Vector3 GetCameraLocation();
-    Vector3 GetCameraRotation();
+    glm::vec3 GetCameraLocation();
+    glm::vec3 GetCameraRotation();
     float GetCameraFOV();
 };

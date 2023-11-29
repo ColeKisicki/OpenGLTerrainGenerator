@@ -2,15 +2,15 @@
 
 Light::Light()
 {
-    Location = Vector3(0.f,0.f,0.f);
+    Location = glm::vec3(0.f,0.f,0.f);
 }
 
-Vector3 Light::GetLocation()
+glm::vec3 Light::GetLocation()
 {
     return Location;
 }
 
-void Light::SetLocation(Vector3 newLocation)
+void Light::SetLocation(glm::vec3 newLocation)
 {
     Location = newLocation;
     if(LightMesh)
@@ -19,21 +19,21 @@ void Light::SetLocation(Vector3 newLocation)
     }
 }
 
-void Light::SetDiffuse(Vector3 newDiffuse)
+void Light::SetDiffuse(glm::vec3 newDiffuse)
 {
     Diffuse[0] = newDiffuse.x;
     Diffuse[1] = newDiffuse.y;
     Diffuse[2] = newDiffuse.z;
 }
 
-void Light::SetSpecular(Vector3 newSpecular)
+void Light::SetSpecular(glm::vec3 newSpecular)
 {
     Specular[0] = newSpecular.x;
     Specular[1] = newSpecular.y;
     Specular[2] = newSpecular.z;
 }
 
-void Light::SetAmbient(Vector3 newAmbient)
+void Light::SetAmbient(glm::vec3 newAmbient)
 {
     Ambient[0] = newAmbient.x;
     Ambient[1] = newAmbient.y;

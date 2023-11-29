@@ -2,12 +2,13 @@
 #include "DisplayObject.hpp"
 #include "Camera.hpp"
 #include "Light.hpp"
+#include "glm/glm.hpp"
 #include "CSCIx229.hpp"
 #include <iostream>
 
 void Scene::RenderScene()
 {
-
+    
     //  OpenGL should normalize normal vectors
     glEnable(GL_NORMALIZE);
     //  Enable lighting
@@ -37,16 +38,11 @@ void Scene::RenderScene()
     glDisable(GL_LIGHTING);
 }
 
-void Scene::SetCamera(Camera *CameraToSet)
-{
-    SceneCamera = CameraToSet;
-}
-
 Camera *Scene::GetCamera()
 {
     if (!SceneCamera)
     {
-        Fatal("NO CAMERA IN SCENE!");
+        SceneCamera = new Camera();
     }
     return SceneCamera;
 }

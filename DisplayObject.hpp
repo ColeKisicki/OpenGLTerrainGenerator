@@ -1,19 +1,19 @@
 #pragma once
-#include "Vector3.hpp"
 #include <string>
+#include "glm/glm.hpp"
 #include "Material.hpp"
 
 class DisplayObject{
     private:
     
     public:
-    Vector3 Location;
-    Vector3 Rotation;
-    Vector3 Scale;
+    glm::vec3 Location;
+    glm::vec3 Rotation;
+    glm::vec3 Scale;
     Material ObjectMaterial;
     
     DisplayObject();
-    DisplayObject(Vector3 loc, Vector3 rot, Vector3 sca);
+    DisplayObject(glm::vec3 loc, glm::vec3 rot, glm::vec3 sca);
     DisplayObject(float locx, float locy, float locz, float rotx, float roty, float rotz, float scax, float scay, float scaz);
     virtual void Display();
     inline bool GetIsVisible() {return IsVisible;};

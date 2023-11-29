@@ -1,19 +1,19 @@
 #pragma once
-#include "Vector3.hpp"
+#include "glm/glm.hpp"
 #include "DisplayObject.hpp"
 class Light
 {
 public:
     Light();
     public:
-    Vector3 GetLocation();
-    void SetLocation(Vector3 newLocation);
+    glm::vec3 GetLocation();
+    void SetLocation(glm::vec3 newLocation);
 
     bool IsOn = true;
     DisplayObject* LightMesh = nullptr;
-    void SetAmbient(Vector3 newAmbient);
-    void SetDiffuse(Vector3 newDiffuse);
-    void SetSpecular(Vector3 newSpecular);
+    void SetAmbient(glm::vec3 newAmbient);
+    void SetDiffuse(glm::vec3 newDiffuse);
+    void SetSpecular(glm::vec3 newSpecular);
 
     
 
@@ -21,5 +21,5 @@ public:
     float Diffuse[4] = {0.50f, 0.50f, 0.50f, 1.0f};
     float Specular[4] = {0.01f, 0.01f, 0.01f, 1.0f};
 protected:
-    Vector3 Location;
+    glm::vec3 Location;
 };

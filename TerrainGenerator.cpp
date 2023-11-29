@@ -1,6 +1,8 @@
 #include "CSCIx229.hpp"
 #include "Scene.hpp"
 #include "Terrain.hpp"
+#include "Camera.hpp"
+#include "glm/glm.hpp"
 #include <ctime>
 #include <random>
 
@@ -32,7 +34,6 @@ void display()
    double Ey = +2 * dim * Sin(ph);
    double Ez = +2 * dim * Cos(th) * Cos(ph);
    gluLookAt(Ex, Ey, Ez, 0, 0, 0, 0, Cos(ph), 0);
-
    Scene::GetScene()->RenderScene();
 
    ErrCheck("display");

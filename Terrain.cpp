@@ -2,9 +2,12 @@
 #include <ctime>
 #include <random>
 #include <vector>
+#include "MarchingCubeTable.cpp"
 #include "FastNoiseLite.hpp"
 #include <iostream>
+#include "glm/glm.hpp"
 #include "CSCIx229.hpp"
+
 #define SIZE 16
 
 Terrain::Terrain()
@@ -25,4 +28,7 @@ Terrain::Terrain()
             }
         }
     }
+    
+    //need to go through and identify which cube is being accessed
+
 }

@@ -28,6 +28,5 @@ public:
     void RenderScene();
     inline void AddSceneObject(DisplayObject* ObjectToAdd) { ObjectsInScene.push_back(ObjectToAdd); };
     inline void AddLight(Light* LightToAdd) { SceneLights.push_back(LightToAdd); };
-    void SetCamera(Camera* CameraToSet);
     class Camera* GetCamera();
 };
