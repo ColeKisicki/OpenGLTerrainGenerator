@@ -1,4 +1,5 @@
 ﻿// Table from http://paulbourke.net/geometry/polygonise/
+#include "glm/glm.hpp"
 
 static const int edges[256] = {
     0x0,

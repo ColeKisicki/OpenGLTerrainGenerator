@@ -13,6 +13,7 @@ public:
     void SetCameraLocation(glm::vec3 NewCameraLocation);
     void SetCameraRotation(glm::vec3 NewCameraRotation);
     void SetCameraFOV(float NewCameraFOV);
+    void RenderCamera();
 
     glm::vec3 GetCameraLocation();
     glm::vec3 GetCameraRotation();

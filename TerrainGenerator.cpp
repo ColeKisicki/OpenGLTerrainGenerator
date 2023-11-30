@@ -1,10 +1,13 @@
 #include "CSCIx229.hpp"
 #include "Scene.hpp"
 #include "Terrain.hpp"
+#include "Cube.hpp"
+#include "basic_structures.hpp"
 #include "Camera.hpp"
 #include "glm/glm.hpp"
 #include <ctime>
 #include <random>
+#include <iostream>
 
 int th = 0;     //  Azimuth of view angle
 int ph = 0;     //  Elevation of view angle
@@ -33,7 +36,22 @@ void display()
    double Ex = -2 * dim * Sin(th) * Cos(ph);
    double Ey = +2 * dim * Sin(ph);
    double Ez = +2 * dim * Cos(th) * Cos(ph);
+   Scene::GetScene()->GetCamera()->SetCameraLocation(glm::vec3(Ex,Ey,Ez));
+
+   glm::vec3 rotaion = glm::normalize(glm::vec3(Ex,Ey,Ez)) * 360.f;
    gluLookAt(Ex, Ey, Ez, 0, 0, 0, 0, Cos(ph), 0);
+   Scene::GetScene()->GetCamera()->SetCameraRotation(rotaion);
+
+
+   Terrain t;
+   glBegin(GL_TRIANGLES);
+   for(auto currentTri : t.terrainTris)
+   {
+      glVertex3f(currentTri.p1.x, currentTri.p1.y, currentTri.p1.z);
+      glVertex3f(currentTri.p2.x, currentTri.p2.y, currentTri.p2.z);
+      glVertex3f(currentTri.p3.x, currentTri.p3.y, currentTri.p3.z);
+   }
+   glEnd();
    Scene::GetScene()->RenderScene();
 
    ErrCheck("display");
@@ -120,7 +138,9 @@ void reshape(int width, int height)
  */
 int main(int argc, char *argv[])
 {
-   Terrain t;
+   
+   Cube* testCube = new Cube(0,0,0,0,0,0,1,1,1);
+   Scene::GetScene()->AddSceneObject(testCube);
    //  Initialize GLUT
    glutInit(&argc, argv);
    //  Request double buffered, true color window with Z buffering at 600x600
