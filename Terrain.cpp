@@ -9,8 +9,8 @@
 #include "basic_structures.hpp"
 #include "CSCIx229.hpp"
 
-#define SIZE 4
-#define ISOLEVEL 0.04
+#define SIZE 100
+#define ISOLEVEL 0.04f
 
 glm::vec3 interpolateVerts(glm::vec4 v1, glm::vec4 v2)
 {
@@ -23,7 +23,7 @@ int indexFromCoord(int x, int y, int z)
     return z * SIZE * SIZE + y * SIZE + x;
 }
 
-Terrain::Terrain()
+void Terrain::Generate()
 {
     // Seed the random number generator so generation remains constant for all terrain generation
     std::srand(static_cast<unsigned>(std::time(nullptr)));
@@ -39,25 +39,27 @@ Terrain::Terrain()
         {
             for (int k = 0; k < SIZE; ++k)
             {
-                float val = noise.GetNoise((float)i, (float)j, (float)k);
+                float val = 0;
+                //val = noise.GetNoise((float)i, (float)j, (float)k);
+                if (j == 0)
+                    val = 1;
                 densityPoints[i][j][k] = glm::vec4(i, j, k, val);
             }
         }
     }
 
     // march cubes
-
     // numcubes = (size - 1) ^3
-    for (int i = 0; i < (densityPoints.size() - 1); i++)
+    for (long long unsigned int i = 0; i < (densityPoints.size() - 1); i++)
     {
-        for (int j = 0; (j < densityPoints[i].size() - 1); j++)
+        for (long long unsigned int j = 0; (j < densityPoints[i].size() - 1); j++)
         {
-            for (int k = 0; k < (densityPoints[i][j].size() - 1); k++)
+            for (long long unsigned int k = 0; k < (densityPoints[i][j].size() - 1); k++)
             {
-                glm::vec4 curPoint = densityPoints[k][j][i];
+                glm::vec4 curPoint = densityPoints[i][j][k];
                 // Array of current verices of cube
 
-                // WRONG
+                // Might need to change order of z, y, x
                 glm::vec4 cubeVertices[8] = {
                     densityPoints[curPoint.z][curPoint.y][curPoint.x],
                     densityPoints[curPoint.z][curPoint.y][curPoint.x + 1],
@@ -67,7 +69,7 @@ Terrain::Terrain()
                     densityPoints[curPoint.z][curPoint.y + 1][curPoint.x + 1],
                     densityPoints[curPoint.z + 1][curPoint.y + 1][curPoint.x + 1],
                     densityPoints[curPoint.z + 1][curPoint.y + 1][curPoint.x]};
-                //WRONG
+                // Might need to change order of z, y, x
 
                 int cubeIndex = 0;
                 if (cubeVertices[0].w < ISOLEVEL)
@@ -87,25 +89,32 @@ Terrain::Terrain()
                 if (cubeVertices[7].w < ISOLEVEL)
                     cubeIndex |= (int)128;
 
-                // Create triangles for current cube configuration
-                for (int i = 0; triangulation[cubeIndex][i] != -1; i += 3)
+                // Goes through points in 3s until runs out of points
+                for (int p = 0; triangulation[cubeIndex][p] != -1; p += 3)
                 {
-                    // Get indices of corner points A and B for each of the three edges
-                    // of the cube that need to be joined to form the triangle.
-                    int a0 = cornerIndexAFromEdge[triangulation[cubeIndex][i]];
-                    int b0 = cornerIndexBFromEdge[triangulation[cubeIndex][i]];
+                    // interpolates each edge based on weighted noises
+                    int a0 = cornerIndexAFromEdge[triangulation[cubeIndex][p]];
+                    int b0 = cornerIndexBFromEdge[triangulation[cubeIndex][p]];
 
-                    int a1 = cornerIndexAFromEdge[triangulation[cubeIndex][i + 1]];
-                    int b1 = cornerIndexBFromEdge[triangulation[cubeIndex][i + 1]];
+                    int a1 = cornerIndexAFromEdge[triangulation[cubeIndex][p + 1]];
+                    int b1 = cornerIndexBFromEdge[triangulation[cubeIndex][p + 1]];
 
-                    int a2 = cornerIndexAFromEdge[triangulation[cubeIndex][i + 2]];
-                    int b2 = cornerIndexBFromEdge[triangulation[cubeIndex][i + 2]];
+                    int a2 = cornerIndexAFromEdge[triangulation[cubeIndex][p + 2]];
+                    int b2 = cornerIndexBFromEdge[triangulation[cubeIndex][p + 2]];
 
-                    Triangle tri;
-                    tri.p1 = interpolateVerts(cubeVertices[a0], cubeVertices[b0]);
-                    tri.p2 = interpolateVerts(cubeVertices[a1], cubeVertices[b1]);
-                    tri.p3 = interpolateVerts(cubeVertices[a2], cubeVertices[b2]);
-                    terrainTris.push_back(tri);
+                    Vertex v1, v2, v3;
+                    v1.location = interpolateVerts(cubeVertices[a0], cubeVertices[b0]);
+                    v2.location = interpolateVerts(cubeVertices[a1], cubeVertices[b1]);
+                    v3.location = interpolateVerts(cubeVertices[a2], cubeVertices[b2]);
+                    // Calculate face normal for the triangle
+                    glm::vec3 faceNormal = glm::normalize(glm::cross(v2.location - v1.location, v3.location - v1.location));
+
+                    // Accumulate face normals to vertex normals using corner indices
+                    v1.normal += faceNormal;
+                    v2.normal += faceNormal;
+                    v3.normal += faceNormal;
+                    Triangle tri(v1, v2, v3);
+                    objectTris.push_back(tri);
                 }
             }
         }

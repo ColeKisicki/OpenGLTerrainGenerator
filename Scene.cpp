@@ -8,7 +8,7 @@
 
 void Scene::RenderScene()
 {
-    //GetCamera()->RenderCamera();
+    GetCamera()->RenderCamera();
     //  OpenGL should normalize normal vectors
     glEnable(GL_NORMALIZE);
     //  Enable lighting

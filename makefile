@@ -25,7 +25,7 @@ CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies
-TerrainGenerator.o: TerrainGenerator.cpp CSCIx229.hpp Light.hpp Camera.hpp Cube.hpp Plane.hpp Terrain.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp
+TerrainGenerator.o: TerrainGenerator.cpp CSCIx229.hpp Light.hpp Camera.hpp Cube.hpp Plane.hpp Terrain.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp ProcRenderObject.hpp
 DisplayObject.o: DisplayObject.cpp Material.hpp CSCIx229.hpp glm/glm.hpp
 Cube.o: Cube.cpp DisplayObject.hpp CSCIx229.hpp glm/glm.hpp
 Camera.o: Camera.cpp CSCIx229.hpp glm/glm.hpp
@@ -38,10 +38,11 @@ print.o: print.cpp CSCIx229.hpp glm/glm.hpp
 loadtexbmp.o: loadtexbmp.cpp CSCIx229.hpp glm/glm.hpp
 loadobj.o: loadobj.cpp CSCIx229.hpp glm/glm.hpp
 projection.o: projection.cpp CSCIx229.hpp glm/glm.hpp
-Terrain.o: Terrain.cpp CSCIx229.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp
+ProcRenderObject.o: ProcRenderObject.cpp DisplayObject.hpp CSCIx229.hpp glm/glm.hpp
+Terrain.o: Terrain.cpp CSCIx229.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp ProcRenderObject.hpp
 
 #  Create archive
-CSCIx229.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o Light.o DisplayObject.o Cube.o Camera.o Plane.o Scene.o Terrain.o
+CSCIx229.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o Light.o DisplayObject.o Cube.o Camera.o Plane.o Scene.o Terrain.o ProcRenderObject.o
 	ar -rcs $@ $^
 
 

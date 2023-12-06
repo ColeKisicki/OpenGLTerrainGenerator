@@ -9,14 +9,30 @@
 #include <random>
 #include <iostream>
 
-int th = 0;     //  Azimuth of view angle
-int ph = 0;     //  Elevation of view angle
-int fov = 55;   //  Field of view (for perspective)
-int obj = 0;    //  Scene/opbject selection
-double asp = 1; //  Aspect ratio
-double dim = 3; //  Size of world
+int fov = 55;    //  Field of view (for perspective)
+double asp = 1;  //  Aspect ratio
+double dim = 20; //  Size of world
 
+int frameCount = 0;   // Count of frames rendered
+int currentTime = 0;  // Current time
+int previousTime = 0; // Time at the previous frame
 
+// Function to calculate and display FPS
+void displayFPS()
+{
+   frameCount++;
+   currentTime = glutGet(GLUT_ELAPSED_TIME);
+
+   int timeInterval = currentTime - previousTime;
+   if (timeInterval > 1000)
+   {
+      float fps = frameCount * 1000.0f / timeInterval;
+      std::cout << "FPS: " << fps << std::endl;
+
+      frameCount = 0;
+      previousTime = currentTime;
+   }
+}
 
 /*
  *  OpenGL (GLUT) calls this routine to display the scene
@@ -25,6 +41,9 @@ void display()
 {
    //  Erase the window and the depth buffer
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glEnable(GL_CULL_FACE);
+   glCullFace(GL_BACK);
+   displayFPS(); // Call function to display FPS
    //  Enable Z-buffering in OpenGL
    glEnable(GL_DEPTH_TEST);
 
@@ -32,31 +51,12 @@ void display()
    glLoadIdentity();
    //  Perspective - set eye position
    glClearColor(0.53f, 0.8f, 0.86f, 1.0f);
-
-   double Ex = -2 * dim * Sin(th) * Cos(ph);
-   double Ey = +2 * dim * Sin(ph);
-   double Ez = +2 * dim * Cos(th) * Cos(ph);
-   Scene::GetScene()->GetCamera()->SetCameraLocation(glm::vec3(Ex,Ey,Ez));
-
-   glm::vec3 rotaion = glm::normalize(glm::vec3(Ex,Ey,Ez)) * 360.f;
-   gluLookAt(Ex, Ey, Ez, 0, 0, 0, 0, Cos(ph), 0);
-   Scene::GetScene()->GetCamera()->SetCameraRotation(rotaion);
-
-
-   Terrain t;
-   glBegin(GL_TRIANGLES);
-   for(auto currentTri : t.terrainTris)
-   {
-      glVertex3f(currentTri.p1.x, currentTri.p1.y, currentTri.p1.z);
-      glVertex3f(currentTri.p2.x, currentTri.p2.y, currentTri.p2.z);
-      glVertex3f(currentTri.p3.x, currentTri.p3.y, currentTri.p3.z);
-   }
-   glEnd();
    Scene::GetScene()->RenderScene();
 
    ErrCheck("display");
    glFlush();
    glutSwapBuffers();
+   glutPostRedisplay();
 }
 
 /*
@@ -67,7 +67,7 @@ void idle()
    //  Elapsed time in seconds
    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
    //  Tell GLUT it is necessary to redisplay the scene
-   glutPostRedisplay();
+   //glutPostRedisplay();
 }
 
 /*
@@ -75,30 +75,14 @@ void idle()
  */
 void special(int key, int x, int y)
 {
-   //  Right arrow key - increase angle by 5 degrees
-   if (key == GLUT_KEY_RIGHT)
-      th += 5;
-   //  Left arrow key - decrease angle by 5 degrees
-   else if (key == GLUT_KEY_LEFT)
-      th -= 5;
-   //  Up arrow key - increase elevation by 5 degrees
-   else if (key == GLUT_KEY_UP)
-      ph += 5;
-   //  Down arrow key - decrease elevation by 5 degrees
-   else if (key == GLUT_KEY_DOWN)
-      ph -= 5;
    //  PageUp key - increase dim
-   else if (key == GLUT_KEY_PAGE_DOWN)
+   if (key == GLUT_KEY_PAGE_DOWN)
       dim += 0.1;
    //  PageDown key - decrease dim
    else if (key == GLUT_KEY_PAGE_UP && dim > 1)
       dim -= 0.1;
-   //  Keep angles to +/-360 degrees
-   th %= 360;
-   ph %= 360;
    //  Update projection
    Project(fov, asp, dim);
-   //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
 
@@ -110,9 +94,9 @@ void key(unsigned char ch, int x, int y)
    //  Exit on ESC
    if (ch == 27)
       exit(0);
-   //  Reset view angle
-   else if (ch == '0')
-      th = ph = 0;
+
+   // Handle camera movement
+   Scene::GetScene()->GetCamera()->HandleKeyPress(ch);
    //  Reproject
    Project(fov, asp, dim);
    glutIdleFunc(idle);
@@ -131,6 +115,12 @@ void reshape(int width, int height)
    glViewport(0, 0, RES * width, RES * height);
    //  Set projection
    Project(fov, asp, dim);
+   glutPostRedisplay();
+}
+
+void motion(int x, int y)
+{
+   Scene::GetScene()->GetCamera()->HandleMouse(x, y);
 }
 
 /*
@@ -138,9 +128,8 @@ void reshape(int width, int height)
  */
 int main(int argc, char *argv[])
 {
-   
-   Cube* testCube = new Cube(0,0,0,0,0,0,1,1,1);
-   Scene::GetScene()->AddSceneObject(testCube);
+   auto t = new Terrain(0, 0, 0, 0, 0, 0, 0.9, 0.9, 0.9);
+   Scene::GetScene()->AddSceneObject(t);
    //  Initialize GLUT
    glutInit(&argc, argv);
    //  Request double buffered, true color window with Z buffering at 600x600
@@ -159,6 +148,7 @@ int main(int argc, char *argv[])
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
    glutIdleFunc(idle);
+   glutPassiveMotionFunc(motion); // Use passive motion function
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();
