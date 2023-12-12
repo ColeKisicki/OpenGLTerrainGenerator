@@ -9,8 +9,10 @@
 #include "basic_structures.hpp"
 #include "CSCIx229.hpp"
 
-#define SIZE 100
-#define ISOLEVEL 0.04f
+#define SIZE 400
+#define ISOLEVEL 0.5f
+#define MAX_HEIGHT 30.f
+#define CUBE_SIZE 0.6
 
 glm::vec3 interpolateVerts(glm::vec4 v1, glm::vec4 v2)
 {
@@ -29,9 +31,21 @@ void Terrain::Generate()
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     FastNoiseLite noise;
     std::vector<std::vector<std::vector<glm::vec4>>> densityPoints(SIZE, std::vector<std::vector<glm::vec4>>(SIZE, std::vector<glm::vec4>(SIZE)));
+    std::vector<std::vector<float>> HeightMap(SIZE, std::vector<float>(SIZE, 0.0f));
     noise.SetSeed(100);
     noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     noise.SetFrequency(0.02);
+
+    // Generate HeightMap using noise.GetNoise(x,y)
+    for (int y = 0; y < SIZE; y++)
+    {
+        for (int x = 0; x < SIZE; x++)
+        {
+            float noiseVal = (noise.GetNoise((float)x, (float)y) + 1.f) / 2.f;
+            HeightMap[y][x] = noiseVal;
+        }
+    }
+
     // generate chunk
     for (int i = 0; i < SIZE; ++i)
     {
@@ -39,11 +53,14 @@ void Terrain::Generate()
         {
             for (int k = 0; k < SIZE; ++k)
             {
-                float val = 0;
-                //val = noise.GetNoise((float)i, (float)j, (float)k);
+                float val = 0.f;
                 if (j == 0)
-                    val = 1;
-                densityPoints[i][j][k] = glm::vec4(i, j, k, val);
+                    val = 1.f;
+                else if (j < (HeightMap[i][k] * MAX_HEIGHT))
+                    val = glm::clamp((HeightMap[i][k] * MAX_HEIGHT) - j, 0.0f, 1.0f);
+                // std::cout<<val<<std::endl;
+                // Adjust the densityPoints array based on the height value
+                densityPoints[i][j][k] = glm::vec4(i * CUBE_SIZE, j * CUBE_SIZE, k * CUBE_SIZE, val);
             }
         }
     }

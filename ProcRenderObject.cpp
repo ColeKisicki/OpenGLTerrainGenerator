@@ -1,5 +1,6 @@
 #include "ProcRenderObject.hpp"
 #include <random>
+#include <iostream>
 #include "basic_structures.hpp"
 #include "CSCIx229.hpp"
 
@@ -8,12 +9,11 @@ void ProcRenderObject::Display()
     // Assuming 'objectTris' holds the list of triangles
 
     // Create and bind VAO
-    glColor3f(1.0f, 1.0f, 0.0f); // Yellow color for Gometry
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    // Create and bind VBOs
+    // Create and bind VBOs for vertices
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -26,45 +26,43 @@ void ProcRenderObject::Display()
 
     // Set vertex attribute pointers
     // Assuming the Vertex struct has consecutive position and normal data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, location)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, location)));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, normal)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
     glEnableVertexAttribArray(1);
 
     // Unbind VAO and VBO
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // Render using VAO
-    glPushMatrix();
-    glTranslated(Location.x, Location.y, Location.z);
-    glRotated(Rotation.x, 1, 0, 0);
-    glRotated(Rotation.y, 0, 1, 0);
-    glRotated(Rotation.z, 0, 0, 1);
-    glScaled(Scale.x, Scale.y, Scale.z);
-
-    glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, objectTris.size() * 3); // Assuming 3 vertices per triangle
-    glBindVertexArray(0);
-
-    glBegin(GL_LINES);
-    glColor3f(1.0f, 0.0f, 0.0f); // Red color for normal lines
-    for (const auto &tri : objectTris)
-    {
-        // Draw normal for each vertex
-        drawNormalLine(tri.p1);
-        drawNormalLine(tri.p2);
-        drawNormalLine(tri.p3);
+    // Generate indices for triangles
+    std::vector<unsigned int> indices;
+    for (size_t i = 0; i < objectTris.size(); ++i) {
+        indices.push_back(i * 3);
+        indices.push_back(i * 3 + 1);
+        indices.push_back(i * 3 + 2);
     }
-    glEnd();
-    glPopMatrix();
+
+    // Create and bind index buffer
+    GLuint indexBufferID;
+    glGenBuffers(1, &indexBufferID);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+    // Render using indexed drawing
+    glBindVertexArray(vao); // Rebind VAO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID); // Bind index buffer
+
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+    // ... Draw normals
 
     // Clean up
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
-
-
+    glDeleteBuffers(1, &indexBufferID);
 }
+
 
 void ProcRenderObject::drawNormalLine(const Vertex &vertex)
 {
