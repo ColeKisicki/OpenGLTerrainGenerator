@@ -1,6 +1,8 @@
 //  CSCIx229 library
 //  Willem A. (Vlakkies) Schreuder
 #include "CSCIx229.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 //
 //  Set projection
@@ -22,4 +24,5 @@ void Project(double fov,double asp,double dim)
    //  Undo previous transformations
    glLoadIdentity();
 }
+
 

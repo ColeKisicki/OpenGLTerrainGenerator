@@ -1,6 +1,8 @@
 #include "Camera.hpp"
 #include <iostream>
 #include "CSCIx229.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 Camera::Camera()
 {
@@ -151,4 +153,10 @@ glm::vec3 Camera::CalculateRightVector() const
     glm::vec3 upVector(0.0f, 1.0f, 0.0f);
 
     return glm::normalize(glm::cross(forwardVector, upVector));
+}
+
+glm::mat4 Camera::GetViewMatrix() const {
+    glm::vec3 forward = CalculateForwardVector();
+    glm::vec3 up(0.0f, 1.0f, 0.0f); // Assuming up vector is Y-axis
+    return glm::lookAt(Location, Location + forward, up);
 }

@@ -1,4 +1,3 @@
-# Homework 5
 EXE=final
 CXX=g++-17
 # Main target
@@ -8,7 +7,14 @@ all: $(EXE)
 ifeq "$(OS)" "Windows_NT"
 CFLG=-O3 -Wall -DUSEGLEW
 LIBS=-lfreeglut -lglew32 -lglu32 -lopengl32 -lm
-CLEAN=rm -f *.exe *.o *.a
+CLEAN=rm -f *.exe *.o *.
+# Debug build settings
+DBGFLG=-g -O0 -Wall -DUSEGLEW
+
+# Debug build
+debug: CFLG=$(DBGFLG)
+debug: $(EXE)
+
 else
 #  OSX
 ifeq "$(shell uname)" "Darwin"
@@ -19,13 +25,14 @@ LIBS=-framework GLUT -framework OpenGL
 else
 CFLG=-O3 -Wall
 LIBS=-lglut -lGLU -lGL -lm
+
 endif
 #  OSX/Linux/Unix/Solaris
 CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies
-final.o: final.cpp CSCIx229.hpp Light.hpp Camera.hpp Cube.hpp Plane.hpp Terrain.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp ProcRenderObject.hpp
+final.o: final.cpp CSCIx229.hpp Light.hpp Camera.hpp Cube.hpp Plane.hpp Terrain.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp MarchingCubeObject.hpp
 DisplayObject.o: DisplayObject.cpp Material.hpp CSCIx229.hpp glm/glm.hpp
 Cube.o: Cube.cpp DisplayObject.hpp CSCIx229.hpp glm/glm.hpp
 Camera.o: Camera.cpp CSCIx229.hpp glm/glm.hpp
@@ -38,11 +45,10 @@ print.o: print.cpp CSCIx229.hpp glm/glm.hpp
 loadtexbmp.o: loadtexbmp.cpp CSCIx229.hpp glm/glm.hpp
 loadobj.o: loadobj.cpp CSCIx229.hpp glm/glm.hpp
 projection.o: projection.cpp CSCIx229.hpp glm/glm.hpp
-ProcRenderObject.o: ProcRenderObject.cpp DisplayObject.hpp CSCIx229.hpp glm/glm.hpp
-Terrain.o: Terrain.cpp CSCIx229.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp ProcRenderObject.hpp
-
+MarchingCubeObject.o: MarchingCubeObject.cpp DisplayObject.hpp CSCIx229.hpp MarchingCubeTable.cpp basic_structures.hpp 
+Terrain.o: Terrain.cpp CSCIx229.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp MarchingCubeObject.o
 #  Create archive
-CSCIx229.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o Light.o DisplayObject.o Cube.o Camera.o Plane.o Scene.o Terrain.o ProcRenderObject.o
+CSCIx229.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o Light.o DisplayObject.o Cube.o Camera.o Plane.o Scene.o Terrain.o MarchingCubeObject.o
 	ar -rcs $@ $^
 
 

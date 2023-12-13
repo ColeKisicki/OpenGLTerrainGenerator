@@ -4,6 +4,7 @@
 #include "Cube.hpp"
 #include "basic_structures.hpp"
 #include "Camera.hpp"
+#include "MarchingCubeObject.hpp"
 #include "glm/glm.hpp"
 #include <ctime>
 #include <random>
@@ -126,47 +127,53 @@ void motion(int x, int y)
 /*
  *  Start up GLUT and tell it what to do
  */
-int main(int argc, char *argv[])
-{
-   auto c1 = new Cube(100,100,40,0,0,0,10,10,10);
-   // Create a new light
-   auto light = new Light(); // Assuming your Light class has a default constructor
-
-   // Set the light's properties (ambient, diffuse, specular)
-   // For example:
-   light->SetAmbient(glm::vec3(0.1f, 0.1f, 0.1f));  // Set ambient color
-   light->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));  // Set diffuse color
-   light->SetSpecular(glm::vec3(1.0f, 1.0f, 1.0f)); // Set specular color
-
-   // Set the light's position
-   light->SetLocation(glm::vec3(50.0f, 50.0f, 30.0f)); // Set the light's location
-
-   // Add the light to the scene
-   Scene::GetScene()->AddLight(light);
-   auto t = new Terrain(0, 0, 0, 0, 0, 0, 1, 1, 1);
-   Scene::GetScene()->AddSceneObject(t);
-   Scene::GetScene()->AddSceneObject(c1);
-   //  Initialize GLUT
-   glutInit(&argc, argv);
-   //  Request double buffered, true color window with Z buffering at 600x600
-   glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-   glutInitWindowSize(400, 400);
-   glutCreateWindow("Terrain Generator");
+int main(int argc, char *argv[]) {
+    // Initialize GLUT
+    glutInit(&argc, argv);
+    // Request double buffered, true color window with Z buffering at 600x600
+    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitWindowSize(400, 400);
+    glutCreateWindow("Terrain Generator");
 
 #ifdef USEGLEW
-   //  Initialize GLEW
-   if (glewInit() != GLEW_OK)
-      Fatal("Error initializing GLEW\n");
+    // Initialize GLEW
+    glewExperimental = GL_TRUE; // Needed in core profile
+    if (glewInit() != GLEW_OK) {
+        Fatal("Error initializing GLEW\n");
+    }
 #endif
-   //  Set callbacks
-   glutDisplayFunc(display);
-   glutReshapeFunc(reshape);
-   glutSpecialFunc(special);
-   glutKeyboardFunc(key);
-   glutIdleFunc(idle);
-   glutPassiveMotionFunc(motion); // Use passive motion function
-   //  Pass control to GLUT so it can interact with the user
-   ErrCheck("init");
-   glutMainLoop();
-   return 0;
+
+    // ... Your existing setup for light, cube, etc ...
+
+    // Create an instance of MarchingCubes
+    auto* terrain = new Terrain(0.5f); // Example isolevel
+    terrain->GenerateTerrain();
+    // Generate the mesh (you need to define how to populate your density grid)
+    terrain->GenerateMesh(); 
+    // Initialize shaders for MarchingCubes
+    terrain->InitializeShaders();
+    // Prepare the mesh for rendering
+    terrain->PrepareVertexData();
+
+    Scene::GetScene()->AddSceneObject(terrain);
+    
+
+    auto Sun = new Light();
+    Sun->SetLocation(glm::vec3(100.f,100.f,100.f));
+    Scene::GetScene()->AddLight(Sun);
+
+    // Set callbacks
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutSpecialFunc(special);
+    glutKeyboardFunc(key);
+    glutIdleFunc(idle);
+    glutPassiveMotionFunc(motion); // Use passive motion function
+
+    // Check for any OpenGL errors
+    ErrCheck("init");
+
+    // Enter the GLUT event processing loop
+    glutMainLoop();
+    return 0;
 }

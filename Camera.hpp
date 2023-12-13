@@ -28,5 +28,6 @@ public:
     void HandleKeyPress(unsigned char key);
     glm::vec3 CalculateForwardVector() const;
     glm::vec3 CalculateRightVector() const;
+    glm::mat4 GetViewMatrix() const;
     float GetCameraFOV();
 };

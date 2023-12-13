@@ -1,12 +1,16 @@
 #pragma once
-#include "ProcRenderObject.hpp"
 #include <vector>
+#include "MarchingCubeObject.hpp"
 #include<iostream>
-class Terrain : public ProcRenderObject{
+class Terrain : public MarchingCubeObject {
 public:
-    const float ChunkSize = 256.f;
-    const float ChunkSections = 16.f;
-    Terrain(float locx, float locy, float locz, float rotx, float roty, float rotz, float scax, float scay, float scaz);
-    void Generate();
-    //generate chunk
+    const int SIZE = 200;
+    const int MAX_HEIGHT = 100;
+
+    Terrain(float isolevel);
+    void GenerateTerrain();
+    void AddVertexColors();
+    virtual void GenerateMesh() override;
+
+    // Add any additional methods or properties specific to Terrain here
 };
