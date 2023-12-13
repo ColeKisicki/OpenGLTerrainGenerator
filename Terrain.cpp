@@ -25,6 +25,12 @@ int indexFromCoord(int x, int y, int z)
     return z * SIZE * SIZE + y * SIZE + x;
 }
 
+Terrain::Terrain(float locx, float locy, float locz, float rotx, float roty, float rotz, float scax, float scay, float scaz)  : ProcRenderObject {locx, locy, locz, rotx, roty, rotz, scax, scay, scaz}
+{
+    SmoothShading = true;
+    Generate();
+}
+
 void Terrain::Generate()
 {
     // Seed the random number generator so generation remains constant for all terrain generation

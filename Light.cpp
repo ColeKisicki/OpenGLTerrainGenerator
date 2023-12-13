@@ -13,10 +13,6 @@ glm::vec3 Light::GetLocation()
 void Light::SetLocation(glm::vec3 newLocation)
 {
     Location = newLocation;
-    if(LightMesh)
-    {
-        LightMesh->Location = newLocation;
-    }
 }
 
 void Light::SetDiffuse(glm::vec3 newDiffuse)

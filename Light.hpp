@@ -10,7 +10,6 @@ public:
     void SetLocation(glm::vec3 newLocation);
 
     bool IsOn = true;
-    DisplayObject* LightMesh = nullptr;
     void SetAmbient(glm::vec3 newAmbient);
     void SetDiffuse(glm::vec3 newDiffuse);
     void SetSpecular(glm::vec3 newSpecular);

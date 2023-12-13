@@ -41,7 +41,7 @@ void Camera::SetCameraFOV(float NewCameraFOV)
 void Camera::UpdateCameraRotation()
 {
     auto xRot = Rotation.z + accumulatedXRotation;
-    auto yRot = Rotation.y + accumulatedYRotation;
+    auto yRot = glm::clamp(Rotation.y + accumulatedYRotation, -89.99f, 89.99f);
 
     SetCameraRotation(glm::vec3(Rotation.x, yRot, xRot));
 

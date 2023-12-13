@@ -6,6 +6,7 @@
 
 void ProcRenderObject::Display()
 {
+        glShadeModel(SmoothShading ? GL_SMOOTH : GL_FLAT);
     // Assuming 'objectTris' holds the list of triangles
 
     // Create and bind VAO
@@ -64,10 +65,10 @@ void ProcRenderObject::Display()
 }
 
 
-void ProcRenderObject::drawNormalLine(const Vertex &vertex)
+void ProcRenderObject::drawNormalLine(glm::vec3& location, glm::vec3& normal)
 {
     // Draw a line from the vertex position to the vertex position + normal
-    glm::vec3 lineEnd = vertex.location + (0.1f * vertex.normal); // Scale the normal for visualization
-    glVertex3f(vertex.location.x, vertex.location.y, vertex.location.z);
+    glm::vec3 lineEnd = location + (0.1f * normal); // Scale the normal for visualization
+    glVertex3f(location.x, location.y, location.z);
     glVertex3f(lineEnd.x, lineEnd.y, lineEnd.z);
 }

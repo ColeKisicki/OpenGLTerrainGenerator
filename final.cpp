@@ -41,8 +41,8 @@ void display()
 {
    //  Erase the window and the depth buffer
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   glEnable(GL_CULL_FACE);
-   glCullFace(GL_BACK);
+   // glEnable(GL_CULL_FACE);
+   // glCullFace(GL_BACK);
    displayFPS(); // Call function to display FPS
    //  Enable Z-buffering in OpenGL
    glEnable(GL_DEPTH_TEST);
@@ -67,7 +67,7 @@ void idle()
    //  Elapsed time in seconds
    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
    //  Tell GLUT it is necessary to redisplay the scene
-   //glutPostRedisplay();
+   // glutPostRedisplay();
 }
 
 /*
@@ -128,8 +128,24 @@ void motion(int x, int y)
  */
 int main(int argc, char *argv[])
 {
-   auto t = new Terrain(0, 0, 0, 0, 0, 0, 0.9, 0.9, 0.9);
+   auto c1 = new Cube(100,100,40,0,0,0,10,10,10);
+   // Create a new light
+   auto light = new Light(); // Assuming your Light class has a default constructor
+
+   // Set the light's properties (ambient, diffuse, specular)
+   // For example:
+   light->SetAmbient(glm::vec3(0.1f, 0.1f, 0.1f));  // Set ambient color
+   light->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));  // Set diffuse color
+   light->SetSpecular(glm::vec3(1.0f, 1.0f, 1.0f)); // Set specular color
+
+   // Set the light's position
+   light->SetLocation(glm::vec3(50.0f, 50.0f, 30.0f)); // Set the light's location
+
+   // Add the light to the scene
+   Scene::GetScene()->AddLight(light);
+   auto t = new Terrain(0, 0, 0, 0, 0, 0, 1, 1, 1);
    Scene::GetScene()->AddSceneObject(t);
+   Scene::GetScene()->AddSceneObject(c1);
    //  Initialize GLUT
    glutInit(&argc, argv);
    //  Request double buffered, true color window with Z buffering at 600x600

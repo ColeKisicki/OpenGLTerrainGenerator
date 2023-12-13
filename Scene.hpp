@@ -1,20 +1,23 @@
 #pragma once
+#include "Camera.hpp"
+#include "Light.hpp"
+#include "DisplayObject.hpp"
 #include <vector>
 // singleton class that allows scene to be globally accessed since there will only be one current scene being displayed at a time
 class Scene
 {
 private:
     inline static Scene* instance;
-    class std::vector<class DisplayObject*> ObjectsInScene;
-    class std::vector<class Light*> SceneLights;
+    class std::vector<DisplayObject*> ObjectsInScene;
+    class std::vector<Light*> SceneLights;
     // Private constructor to prevent external instantiation
-    Scene(){};
+    Scene();
     // Private destructor to prevent accidental deletion
-    ~Scene(){};
+    ~Scene();
     // Prevent copying or assignment
     Scene(const Scene &) = delete;
     // Scene& operator=(const Scene&) = delete;
-    class Camera* SceneCamera = nullptr;
+    Camera* SceneCamera = nullptr;
 public:
     static Scene *GetScene()
     {
