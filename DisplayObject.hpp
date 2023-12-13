@@ -15,7 +15,7 @@ class DisplayObject{
     DisplayObject();
     DisplayObject(glm::vec3 loc, glm::vec3 rot, glm::vec3 sca);
     DisplayObject(float locx, float locy, float locz, float rotx, float roty, float rotz, float scax, float scay, float scaz);
-    virtual void Display();
+    virtual void Render();
     inline bool GetIsVisible() {return IsVisible;};
     inline void SetIsVisible(bool NewVisibility) {IsVisible = NewVisibility;};
     

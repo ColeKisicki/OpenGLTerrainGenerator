@@ -1,7 +1,7 @@
 #include "Plane.hpp"
 #include "CSCIx229.hpp"
 
-void Plane::Display()
+void Plane::Render()
 {
     if (!IsVisible)
         return;

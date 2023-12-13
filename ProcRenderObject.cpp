@@ -4,7 +4,7 @@
 #include "basic_structures.hpp"
 #include "CSCIx229.hpp"
 
-void ProcRenderObject::Display()
+void ProcRenderObject::Render()
 {
         glShadeModel(SmoothShading ? GL_SMOOTH : GL_FLAT);
     // Assuming 'objectTris' holds the list of triangles

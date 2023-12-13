@@ -69,7 +69,7 @@ void Scene::RenderScene()
 
     for (auto Object : ObjectsInScene)
     {
-        Object->Display();
+        Object->Render();
     }
 
     glDisable(GL_LIGHTING);
