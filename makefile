@@ -1,5 +1,5 @@
 # Homework 5
-EXE=TerrainGenerator
+EXE=final
 CXX=g++-17
 # Main target
 all: $(EXE)
@@ -25,7 +25,7 @@ CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies
-TerrainGenerator.o: TerrainGenerator.cpp CSCIx229.hpp Light.hpp Camera.hpp Cube.hpp Plane.hpp Terrain.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp ProcRenderObject.hpp
+final.o: final.cpp CSCIx229.hpp Light.hpp Camera.hpp Cube.hpp Plane.hpp Terrain.hpp glm/glm.hpp basic_structures.hpp MarchingCubeTable.cpp ProcRenderObject.hpp
 DisplayObject.o: DisplayObject.cpp Material.hpp CSCIx229.hpp glm/glm.hpp
 Cube.o: Cube.cpp DisplayObject.hpp CSCIx229.hpp glm/glm.hpp
 Camera.o: Camera.cpp CSCIx229.hpp glm/glm.hpp
@@ -53,7 +53,7 @@ CSCIx229.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o Light.
 	g++ -c $(CFLG)  $<
 
 #  Link
-TerrainGenerator:TerrainGenerator.o CSCIx229.a
+final:final.o CSCIx229.a
 	g++ $(CFLG) -o $@ $^  $(LIBS)
 
 #  Clean
