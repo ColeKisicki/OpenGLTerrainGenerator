@@ -1,7 +1,7 @@
 #include "Plane.hpp"
 #include "CSCIx229.hpp"
 
-void Plane::Render()
+void Plane::Render(unsigned int shaderProgramID)
 {
     if (!IsVisible)
         return;

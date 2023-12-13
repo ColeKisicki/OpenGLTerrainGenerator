@@ -42,8 +42,8 @@ void display()
 {
    //  Erase the window and the depth buffer
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   // glEnable(GL_CULL_FACE);
-   // glCullFace(GL_BACK);
+   glEnable(GL_CULL_FACE);
+   glCullFace(GL_BACK);
    displayFPS(); // Call function to display FPS
    //  Enable Z-buffering in OpenGL
    glEnable(GL_DEPTH_TEST);
@@ -127,53 +127,57 @@ void motion(int x, int y)
 /*
  *  Start up GLUT and tell it what to do
  */
-int main(int argc, char *argv[]) {
-    // Initialize GLUT
-    glutInit(&argc, argv);
-    // Request double buffered, true color window with Z buffering at 600x600
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-    glutInitWindowSize(400, 400);
-    glutCreateWindow("Terrain Generator");
+int main(int argc, char *argv[])
+{
+   // Initialize GLUT
+   glutInit(&argc, argv);
+   // Request double buffered, true color window with Z buffering at 600x600
+   glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glutInitWindowSize(400, 400);
+   glutCreateWindow("Terrain Generator");
 
 #ifdef USEGLEW
-    // Initialize GLEW
-    glewExperimental = GL_TRUE; // Needed in core profile
-    if (glewInit() != GLEW_OK) {
-        Fatal("Error initializing GLEW\n");
-    }
+   // Initialize GLEW
+   glewExperimental = GL_TRUE; // Needed in core profile
+   if (glewInit() != GLEW_OK)
+   {
+      Fatal("Error initializing GLEW\n");
+   }
 #endif
 
-    // ... Your existing setup for light, cube, etc ...
+   // ... Your existing setup for light, cube, etc ...
 
-    // Create an instance of MarchingCubes
-    auto* terrain = new Terrain(0.5f); // Example isolevel
-    terrain->GenerateTerrain();
-    // Generate the mesh (you need to define how to populate your density grid)
-    terrain->GenerateMesh(); 
-    // Initialize shaders for MarchingCubes
-    terrain->InitializeShaders();
-    // Prepare the mesh for rendering
-    terrain->PrepareVertexData();
+   // Create an instance of MarchingCubes
+   auto *terrain = new Terrain(0.3f); // Example isolevel
+   terrain->GenerateTerrain();
+   // Generate the mesh (you need to define how to populate your density grid)
+   terrain->GenerateMesh();
+   // Prepare the mesh for rendering
+   terrain->PrepareVertexData();
 
-    Scene::GetScene()->AddSceneObject(terrain);
-    
+   Scene::GetScene()->AddSceneObject(terrain);
+   Scene::GetScene()->GetCamera()->SetCameraLocation(glm::vec3(50,50,80));
 
-    auto Sun = new Light();
-    Sun->SetLocation(glm::vec3(100.f,100.f,100.f));
-    Scene::GetScene()->AddLight(Sun);
+   auto Sun = new Light();
+   Sun->SetLocation(glm::vec3(100.f, 100.f, 100.f));
+   Sun->SetAmbient(glm::vec3(0.1f, 0.1f, 0.1f));
+   Sun->SetDiffuse(glm::vec3(0.8f, 0.8f, 0.8f));
+   Sun->SetSpecular(glm::vec3(1.f, 1.f, 1.f));
+   Scene::GetScene()->AddLight(Sun);
 
-    // Set callbacks
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutSpecialFunc(special);
-    glutKeyboardFunc(key);
-    glutIdleFunc(idle);
-    glutPassiveMotionFunc(motion); // Use passive motion function
+   // Set callbacks
+   glutDisplayFunc(display);
+   glutReshapeFunc(reshape);
+   glutSpecialFunc(special);
+   glutKeyboardFunc(key);
+   glutIdleFunc(idle);
+   glutPassiveMotionFunc(motion); // Use passive motion function
 
-    // Check for any OpenGL errors
-    ErrCheck("init");
+   // Check for any OpenGL errors
+   ErrCheck("init");
 
-    // Enter the GLUT event processing loop
-    glutMainLoop();
-    return 0;
+   // Enter the GLUT event processing loop
+   glutMainLoop();
+   return 0;
 }

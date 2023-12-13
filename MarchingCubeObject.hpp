@@ -20,12 +20,8 @@ class MarchingCubeObject : public DisplayObject
 {
 public:
     MarchingCubeObject(float isolevel);
-    std::string LoadShaderSource(const char *filepath);
-    unsigned int CompileShader(unsigned int type, const std::string &source);
-    void CreateShaderProgram();
-    void InitializeShaders();
     virtual void GenerateMesh();
-    virtual void Render() override;
+    virtual void Render(unsigned int shaderProgramID) override;
     glm::vec3 VertexInterp(const glm::vec3 &p1, const glm::vec3 &p2, float valp1, float valp2);
     std::shared_ptr<Vertex> GetOrCreateVertex(const glm::vec3 &position);
     const std::vector<Triangle> &GetTriangles() const;
@@ -33,7 +29,7 @@ public:
     void PopulateDensityGrid();
 
 protected:
-    unsigned int shaderProgram;
+
     float isolevel;
     std::vector<Triangle> objectTris;
     std::vector<std::vector<std::vector<float>>> densityGrid;

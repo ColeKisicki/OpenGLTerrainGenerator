@@ -3,80 +3,117 @@
 #include "Camera.hpp"
 #include "Light.hpp"
 #include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "CSCIx229.hpp"
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
 
 Scene::Scene()
 {
     SceneCamera = new Camera();
+    InitializeShaders();
 }
 
 Scene::~Scene()
 {
     delete SceneCamera;
-    for(auto Object: ObjectsInScene)
-    {
-        delete Object;
-    }
     for(auto Light : SceneLights)
     {
         delete Light;
     }
 }
+
 void Scene::RenderScene()
 {
+        // Activate the shader program
+    glUseProgram(shaderProgram);
+
+    // Set the camera properties
     GetCamera()->RenderCamera();
-    //  OpenGL should normalize normal vectors
-    glEnable(GL_NORMALIZE);
-    //  Enable lighting
-    glEnable(GL_LIGHTING);
-    //  Location of viewer for specular calculations
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
-    //  glColor sets ambient and diffuse color materials
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
-    for (long long unsigned int i = 0; i < SceneLights.size(); i++)
+    // Iterate over lights and set light properties
+    for (auto& light : SceneLights)
     {
-        if (i > 7)
-        {
-            Fatal("Too many lights in scene. Max of 8");
-        }
-        glEnable(GL_LIGHT0 + i);
-
-        // Apply transformations to the light position
-        glm::vec3 lightPos = SceneLights[i]->GetLocation();
-        glPushMatrix();
-        glTranslatef(lightPos.x, lightPos.y, lightPos.z); // Translate light position
-        // Apply any other transformations (e.g., rotation, scaling) to the light if needed
-        // ...
-
-        // Set the transformed light position
-        float TransformedLocation[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        glLightfv(GL_LIGHT0 + i, GL_POSITION, TransformedLocation);
-        glPopMatrix();
-
-        // Set light properties
-        glLightfv(GL_LIGHT0 + i, GL_AMBIENT, SceneLights[i]->Ambient);
-        glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, SceneLights[i]->Diffuse);
-        glLightfv(GL_LIGHT0 + i, GL_SPECULAR, SceneLights[i]->Specular);
-
-        // Render a sphere at the light's position for debugging
-        glPushMatrix();
-        glTranslatef(lightPos.x, lightPos.y, lightPos.z);
-        glutSolidSphere(0.2, 20, 20); // Adjust the radius as needed
-        glPopMatrix();
+        // Set light properties as uniform variables
+        // Assuming uniform names: u_LightPos, u_Ambient, u_Diffuse, u_Specular
+        glUniform3fv(glGetUniformLocation(shaderProgram, "u_LightPos"), 1, glm::value_ptr(light->GetLocation()));
+        glUniform4fv(glGetUniformLocation(shaderProgram, "u_Ambient"), 1, light->Ambient);
+        glUniform4fv(glGetUniformLocation(shaderProgram, "u_Diffuse"), 1, light->Diffuse);
+        glUniform4fv(glGetUniformLocation(shaderProgram, "u_Specular"), 1, light->Specular);
+        glUniform4fv(glGetUniformLocation(shaderProgram, "u_Specular"), 1, light->Specular);
+        // ... Additional properties as needed
     }
 
     for (auto Object : ObjectsInScene)
     {
-        Object->Render();
+        Object->Render(shaderProgram);
     }
-
-    glDisable(GL_LIGHTING);
-    glDisable(GL_COLOR_MATERIAL);
+    glUseProgram(0);
 }
 
 Camera *Scene::GetCamera()
 {
     return SceneCamera;
+}
+
+
+
+std::string Scene::LoadShaderSource(const char *filepath)
+{
+    std::ifstream shaderFile;
+    std::stringstream shaderStream;
+
+    shaderFile.open(filepath);
+    shaderStream << shaderFile.rdbuf();
+    shaderFile.close();
+
+    return shaderStream.str();
+}
+
+unsigned int Scene::CompileShader(unsigned int type, const std::string &source)
+{
+    unsigned int id = glCreateShader(type);
+    const char *src = source.c_str();
+    glShaderSource(id, 1, &src, nullptr);
+    glCompileShader(id);
+
+    int result;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    if (result == GL_FALSE)
+    {
+        int length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        char *message = (char *)alloca(length * sizeof(char));
+        glGetShaderInfoLog(id, length, &length, message);
+        std::cout << "Failed to compile "
+                  << (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
+                  << " shader!" << std::endl;
+        std::cout << message << std::endl;
+        glDeleteShader(id);
+        return 0;
+    }
+
+    return id;
+}
+
+void Scene::CreateShaderProgram()
+{
+    shaderProgram = glCreateProgram();
+    unsigned int vertexShader = CompileShader(GL_VERTEX_SHADER, LoadShaderSource("vertex_shader.glsl"));
+    unsigned int fragmentShader = CompileShader(GL_FRAGMENT_SHADER, LoadShaderSource("fragment_shader.glsl"));
+
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    glValidateProgram(shaderProgram);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+}
+
+void Scene::InitializeShaders()
+{
+    CreateShaderProgram();
 }

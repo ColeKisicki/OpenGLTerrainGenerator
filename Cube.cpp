@@ -1,7 +1,7 @@
 #include "Cube.hpp"
 #include "CSCIx229.hpp"
 
-void Cube::Render()
+void Cube::Render(unsigned int shaderProgramID)
 {
     if(!IsVisible) return;
     glPushMatrix();

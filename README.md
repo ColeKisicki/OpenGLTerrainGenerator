@@ -9,6 +9,7 @@ This procedural terrain generator uses the marching cubes algorithm and random n
   - [Project Description](#project-description)
   - [Features](#features)
   - [Naviagation](#naviagation)
+  - [Sources](#sources)
 
 ## Project Description
 
@@ -30,3 +31,7 @@ The Procedural Terrain Generator leverages the power of the marching cubes algor
 ## Naviagation
 
 The naviagation is similar to a first person shooter. The camera can be moved forward/left/backward/right using 'wasd' and the camera can be rotated using the mouse.
+
+## Sources
+
+- The main source I used was a video by sebastian lague on the marching cubes algorithm. The main contribution I got from that video was the marching cubes table that I used.

@@ -28,8 +28,13 @@ public:
         return instance;
     }
 
+    unsigned int shaderProgram;
     void RenderScene();
     inline void AddSceneObject(DisplayObject* ObjectToAdd) { ObjectsInScene.push_back(ObjectToAdd); };
     inline void AddLight(Light* LightToAdd) { SceneLights.push_back(LightToAdd); };
     class Camera* GetCamera();
+    std::string LoadShaderSource(const char *filepath);
+    unsigned int CompileShader(unsigned int type, const std::string &source);
+    void CreateShaderProgram();
+    void InitializeShaders();
 };

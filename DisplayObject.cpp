@@ -23,6 +23,6 @@ DisplayObject::DisplayObject(float locx, float locy, float locz, float rotx, flo
     Scale = glm::vec3(scax,scay,scaz);
 }
 
-void DisplayObject::Render()
+void DisplayObject::Render(unsigned int shaderProgramID)
 {
 }

@@ -1,9 +1,7 @@
 #include "MarchingCubeObject.hpp"
 #include "MarchingCubeTable.cpp"
 #include "CSCIx229.hpp"
-#include <string>
-#include <fstream>
-#include <sstream>
+
 #include <ctime>
 #include <iostream>
 #include "glm/glm.hpp"
@@ -21,63 +19,6 @@ MarchingCubeObject::MarchingCubeObject(float isolevel) : DisplayObject(0, 0, 0, 
     this->isolevel = isolevel;
 }
 
-std::string MarchingCubeObject::LoadShaderSource(const char *filepath)
-{
-    std::ifstream shaderFile;
-    std::stringstream shaderStream;
-
-    shaderFile.open(filepath);
-    shaderStream << shaderFile.rdbuf();
-    shaderFile.close();
-
-    return shaderStream.str();
-}
-
-unsigned int MarchingCubeObject::CompileShader(unsigned int type, const std::string &source)
-{
-    unsigned int id = glCreateShader(type);
-    const char *src = source.c_str();
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
-
-    int result;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if (result == GL_FALSE)
-    {
-        int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-        char *message = (char *)alloca(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, message);
-        std::cout << "Failed to compile "
-                  << (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
-                  << " shader!" << std::endl;
-        std::cout << message << std::endl;
-        glDeleteShader(id);
-        return 0;
-    }
-
-    return id;
-}
-
-void MarchingCubeObject::CreateShaderProgram()
-{
-    shaderProgram = glCreateProgram();
-    unsigned int vertexShader = CompileShader(GL_VERTEX_SHADER, LoadShaderSource("vertex_shader.glsl"));
-    unsigned int fragmentShader = CompileShader(GL_FRAGMENT_SHADER, LoadShaderSource("fragment_shader.glsl"));
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glValidateProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-}
-
-void MarchingCubeObject::InitializeShaders()
-{
-    CreateShaderProgram();
-}
 
 void MarchingCubeObject::GenerateMesh()
 {
@@ -154,27 +95,25 @@ void MarchingCubeObject::GenerateMesh()
     }
 }
 
-void MarchingCubeObject::Render()
+void MarchingCubeObject::Render(unsigned int shaderProgramID)
 {
     // Update matrices
     glm::mat4 modelMatrix = glm::mat4(1.0f); // Identity matrix for model matrix
     glm::mat4 viewMatrix = Scene::GetScene()->GetCamera()->GetViewMatrix();
     glm::mat4 projectionMatrix = GetProjectionMatrix(55, 2, 20);
 
+
     // Assuming you have GLuint shaderProgram and the uniform locations
-    GLuint modelLoc = glGetUniformLocation(shaderProgram, "model");
-    GLuint viewLoc = glGetUniformLocation(shaderProgram, "view");
-    GLuint projectionLoc = glGetUniformLocation(shaderProgram, "projection");
+    GLuint modelLoc = glGetUniformLocation(shaderProgramID, "model");
+    GLuint viewLoc = glGetUniformLocation(shaderProgramID, "view");
+    GLuint projectionLoc = glGetUniformLocation(shaderProgramID, "projection");
 
-    // Use shader program
-    glUseProgram(shaderProgram);
-
-    // Use shader program
-    glUseProgram(shaderProgram);
     // Pass matrices to the shader
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+    
 
     // Bind the VAO
     glBindVertexArray(VAO);

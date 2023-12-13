@@ -9,7 +9,6 @@
 #include "basic_structures.hpp"
 #include "CSCIx229.hpp"
 
-
 Terrain::Terrain(float isolevel) : MarchingCubeObject(isolevel)
 {
     GenerateTerrain();
@@ -33,15 +32,15 @@ void Terrain::GenerateTerrain()
         }
     }
     std::vector<std::vector<float>> HeightMap(SIZE, std::vector<float>(SIZE, 0.0f));
-    
+
     noise.SetSeed(35);
     noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     noise.SetFrequency(0.02);
-    
+
     // Add octaves, lacunarity, persistence, noise scale, and noise weight here
-    noise.SetFractalOctaves(4); // Number of octaves
+    noise.SetFractalOctaves(4);       // Number of octaves
     noise.SetFractalLacunarity(2.0f); // Lacunarity
-    noise.SetFractalGain(0.5f); // Persistence
+    noise.SetFractalGain(0.5f);       // Persistence
 
     // Generate HeightMap using noise.GetNoise(x,y)
     for (int y = 0; y < SIZE; y++)
@@ -61,8 +60,19 @@ void Terrain::GenerateTerrain()
             for (int k = 0; k < SIZE; ++k)
             {
                 float val = 0.f;
-                if (j < (HeightMap[i][k] * MAX_HEIGHT))
+
+                if (j <= (HeightMap[i][k] * MAX_HEIGHT) && j + 1 > (HeightMap[i][k] * MAX_HEIGHT))
+                {
                     val = glm::clamp((HeightMap[i][k] * MAX_HEIGHT) - j, 0.0f, 1.0f);
+                }
+                else if (j <= (HeightMap[i][k] * MAX_HEIGHT))
+                {
+                    val = 1;
+                }
+                else
+                {
+                    val = 0;
+                }
                 // Adjust the densityPoints array based on the height value
                 densityGrid[i][j][k] = val;
             }
@@ -80,20 +90,19 @@ void Terrain::AddVertexColors()
 
         // Calculate color based on height (you can adjust these values)
         glm::vec3 color;
-        if (position.y > MAX_HEIGHT * 0.5)
+        if (position.y > MAX_HEIGHT * 0.7)
         {
-            color = glm::vec3(1.0f, 1.0f, 1.0f); // White
-
+            color = glm::vec3(0.9f, 0.9f, 0.9f); // White
         }
-        else if (steepness < 0.5f)
+        else if (steepness < 0.f)
         {
             // Stone color
-            color = glm::vec3(0.5f, 0.5f, 0.5f); // Grey
+            color = glm::vec3(0.4f, 0.3f, 0.3f); // Grey
         }
         else
         {
             // Grass color
-            color = glm::vec3(0.0f, 1.0f, 0.0f); // Green
+            color = glm::vec3(0.439f, 0.761f, 0.404f); // Green
         }
 
         vertex->color = color; // Set the color for the vertex
